@@ -1,4 +1,5 @@
-import { useEffect, useState, DragEvent } from 'react'
+import { useEffect, useState } from 'react'
+import type { DragEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 // Supabase setup
