@@ -22,9 +22,12 @@ function App() {
   const [darkMode, setDarkMode] = useState(false)
 
   const fetchUploads = async () => {
+    if (!user?.id) return
+
     const { data, error } = await supabase
       .from('datasets')
       .select('title, description, ipfs_url')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -90,7 +93,8 @@ function App() {
           title,
           description,
           filename: file.name,
-          ipfs_url: ipfsUrl
+          ipfs_url: ipfsUrl,
+          user_id: user.id
         }])
 
         fetchUploads()
