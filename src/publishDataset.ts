@@ -1,6 +1,5 @@
 import { getOceanInstance } from './ocean'
-import { Metadata } from '@oceanprotocol/lib/dist/node/metamodel/Metadata'
-import { ServiceType } from '@oceanprotocol/lib/dist/node/ocean/Ocean'
+import { Metadata, ServiceType } from '@oceanprotocol/lib'
 
 export async function publishDataset(account: string, title: string, cid: string) {
   const ocean = await getOceanInstance()
@@ -27,17 +26,16 @@ export async function publishDataset(account: string, title: string, cid: string
   }
 
   const service = {
-  type: 'access' as ServiceType,
-  files: metadata.main.files,
-  timeout: 0,
-  datatokenOptions: {
-    name: `${title} Token`,
-    symbol: 'GSTKN',
-    cap: '1000',
-    amount: '100'
+    type: 'access' as ServiceType,
+    files: metadata.main.files,
+    timeout: 0,
+    datatokenOptions: {
+      name: `${title} Token`,
+      symbol: 'GSTKN',
+      cap: '1000',
+      amount: '100'
+    }
   }
-}
-
 
   const asset = await ocean.assets.create(metadata, account, service)
   const datatokenAddress = asset.services[0].datatokenAddress
@@ -46,7 +44,7 @@ export async function publishDataset(account: string, title: string, cid: string
     datatoken: datatokenAddress,
     baseToken: ocean.datatokens.getAddress('OCEAN'),
     owner: account,
-    fixedRate: '30',
+    fixedRate: '30', // price in baseToken (OCEAN)
     marketFeeCollector: account,
     marketFee: '0'
   }

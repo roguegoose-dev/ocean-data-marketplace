@@ -7,20 +7,39 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_KEY!
 )
 
+type Dataset = {
+  title: string
+  description?: string
+  ipfs_url: string
+  datatoken: string
+  created_at?: string
+}
+
 export default function Marketplace() {
-  const [datasets, setDatasets] = useState<any[]>([])
+  const [datasets, setDatasets] = useState<Dataset[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchData = async () => {
+    setLoading(true)
+    setError(null)
+
+    const { data, error } = await supabase
+      .from('datasets')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching datasets:', error.message)
+      setError('Failed to load datasets.')
+      return
+    }
+
+    setDatasets(data || [])
+    setLoading(false)
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from('datasets').select('*')
-      if (error) {
-        console.error('Error fetching datasets:', error)
-        return
-      }
-      setDatasets(data)
-      setLoading(false)
-    }
     fetchData()
   }, [])
 
@@ -28,22 +47,35 @@ export default function Marketplace() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold mb-6">🌊 Goose Solutions Marketplace</h1>
-      {datasets.length === 0 && (
-        <p className="text-center text-gray-500">No datasets available yet.</p>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">🌊 Goose Solutions Marketplace</h1>
+        <button
+          onClick={fetchData}
+          className="text-sm text-blue-600 underline hover:text-blue-800"
+        >
+          Refresh
+        </button>
+      </div>
+
+      {error && (
+        <p className="text-center text-red-600">{error}</p>
       )}
-      {datasets.map((d, i) => {
-        const ipfsCid = d.ipfs_url.replace('https://gateway.pinata.cloud/ipfs/', '')
-        return (
-          <DatasetViewer
-            key={i}
-            title={d.title}
-            datatokenAddress={d.datatoken}
-            ipfsCid={ipfsCid}
-          />
-        )
-      })}
+
+      {datasets.length === 0 ? (
+        <p className="text-center text-gray-500">No datasets available yet.</p>
+      ) : (
+        datasets.map((d, i) => {
+          const ipfsCid = d.ipfs_url.replace('https://gateway.pinata.cloud/ipfs/', '')
+          return (
+            <DatasetViewer
+              key={i}
+              title={d.title}
+              datatokenAddress={d.datatoken}
+              ipfsCid={ipfsCid}
+            />
+          )
+        })
+      )}
     </div>
   )
 }
-
