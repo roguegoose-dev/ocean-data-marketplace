@@ -26,16 +26,17 @@ export async function publishDataset(account: string, title: string, cid: string
   }
 
   const service = {
-    type: 'access' as ServiceType,
-    files: metadata.main.files,
-    timeout: 0,
-    datatokenOptions: {
-      name: `${title} Token`,
-      symbol: 'GSTKN',
-      cap: '1000',
-      amount: '100'
-    }
+  type: ServiceAccess,
+  files: metadata.main.files,
+  timeout: 0,
+  datatokenOptions: {
+    name: `${title} Token`,
+    symbol: 'GSTKN',
+    cap: '1000',
+    amount: '100'
   }
+}
+
 
   const asset = await ocean.assets.create(metadata, account, service)
   const datatokenAddress = asset.services[0].datatokenAddress
