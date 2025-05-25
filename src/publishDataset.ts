@@ -1,10 +1,11 @@
 import { getOceanInstance } from './ocean'
-import { MetadataMarket, ServiceAccess } from '@oceanprotocol/lib'
+import { Metadata } from '@oceanprotocol/lib/dist/node/metamodel/Metadata'
+import { ServiceType } from '@oceanprotocol/lib/dist/node/ocean/Ocean'
 
 export async function publishDataset(account: string, title: string, cid: string) {
   const ocean = await getOceanInstance()
 
-  const metadata: MetadataMarket = {
+  const metadata: Metadata = {
     main: {
       name: title,
       type: 'dataset',
