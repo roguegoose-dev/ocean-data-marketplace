@@ -1,12 +1,9 @@
-interface EthereumWindow extends Window {
-  ethereum?: any
-}
+// src/ocean.ts
 
-declare const window: EthereumWindow
+import { VeOcean, ConfigHelper } from '@oceanprotocol/lib'; // Corrected import: removed 'Ocean'
 
-export async function connectWallet(): Promise<string> {
-  if (!window.ethereum) throw new Error('Wallet not found')
-
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-  return accounts[0]
+export async function getOceanInstance() {
+  const config = new ConfigHelper().getConfig('polygon'); // Assuming 'polygon' for your network
+  const ocean = await VeOcean.getInstance(config);
+  return ocean;
 }
