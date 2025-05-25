@@ -26,7 +26,7 @@ export async function publishDataset(account: string, title: string, cid: string
   }
 
   const service = {
-  type: ServiceAccess,
+  type: 'access' as ServiceType,
   files: metadata.main.files,
   timeout: 0,
   datatokenOptions: {
