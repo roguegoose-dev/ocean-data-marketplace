@@ -1,14 +1,5 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
-  ],
-  "build": {
-    "env": {
-      "VITE_SUPABASE_URL": "@VITE_SUPABASE_URL",
-      "VITE_SUPABASE_KEY": "@VITE_SUPABASE_KEY",
-      "VITE_PINATA_JWT": "@VITE_PINATA_JWT",
-      "VITE_NETWORK": "@VITE_NETWORK"
-    },
-    "outputDirectory": "dist"
-  }
+  ]
 }
