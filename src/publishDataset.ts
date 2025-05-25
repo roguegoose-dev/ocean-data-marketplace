@@ -7,7 +7,7 @@ export async function publishDataset(account: string, title: string, cid: string
   const metadata: MetadataMarket = {
     main: {
       name: title,
-      type: ServiceAccess,
+      type: 'dataset',
       dateCreated: new Date().toISOString(),
       author: 'Goose Solutions',
       license: 'CC0: Public Domain',

@@ -1,5 +1,5 @@
 
-import { Ocean, ConfigHelper } from '@oceanprotocol/lib'
+import { Ocean } from '@oceanprotocol/lib/dist/node/ocean/Ocean'
 
 export async function getOceanInstance() {
   const config = new ConfigHelper().getConfig('polygon') // Or 'mumbai' for testnet
