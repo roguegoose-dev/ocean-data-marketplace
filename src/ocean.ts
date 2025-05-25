@@ -1,7 +1,7 @@
-import { Ocean, ConfigHelper } from '@oceanprotocol/lib'
+import { VeOcean, ConfigHelper } from '@oceanprotocol/lib'
 
-export async function getOceanInstance(): Promise<Ocean> {
-  const config = new ConfigHelper().getConfig('polygon') // Use 'mumbai' for testnet
-  const ocean = await Ocean.getInstance(config)
+export async function getOceanInstance() {
+  const config = new ConfigHelper().getConfig('polygon')
+  const ocean = await VeOcean.getInstance(config)
   return ocean
 }
