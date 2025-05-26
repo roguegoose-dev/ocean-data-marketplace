@@ -19,6 +19,7 @@ export default function Marketplace() {
   const [datasets, setDatasets] = useState<Dataset[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('') // ✅ Search term state
 
   const fetchData = async () => {
     setLoading(true)
@@ -45,26 +46,49 @@ export default function Marketplace() {
 
   if (loading) return <div className="p-8 text-center">Loading marketplace...</div>
 
+  const filteredDatasets = datasets.filter((d) => {
+    const lower = searchTerm.toLowerCase()
+    return (
+      d.title.toLowerCase().includes(lower) ||
+      d.description?.toLowerCase().includes(lower)
+    )
+  })
+
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">🌊 Goose Solutions Marketplace</h1>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">🌊 Decentralized Dataset Marketplace (Ocean Protocol)</h1>
+          <p className="text-sm text-gray-600 mt-1">Built and managed by Goose Solutions LLC</p>
+        </div>
         <button
           onClick={fetchData}
-          className="text-sm text-blue-600 underline hover:text-blue-800"
+          className="text-sm text-blue-600 underline hover:text-blue-800 mt-4 md:mt-0"
         >
           Refresh
         </button>
       </div>
 
+      {/* ✅ Search Bar */}
+      <input
+        type="text"
+        placeholder="Search datasets by title or description..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full p-2 border rounded mb-4"
+      />
+
       {error && (
         <p className="text-center text-red-600">{error}</p>
       )}
 
-      {datasets.length === 0 ? (
-        <p className="text-center text-gray-500">No datasets available yet.</p>
+      {filteredDatasets.length === 0 ? (
+        <div className="text-center py-20">
+          <h2 className="text-xl font-semibold mb-2">🚫 No matching datasets found</h2>
+          <p className="text-gray-600">Try adjusting your search or come back later.</p>
+        </div>
       ) : (
-        datasets.map((d, i) => {
+        filteredDatasets.map((d, i) => {
           const ipfsCid = d.ipfs_url.replace('https://gateway.pinata.cloud/ipfs/', '')
           return (
             <DatasetViewer
