@@ -1,9 +1,15 @@
-// src/ocean.ts
+// src/wallet.ts
 
-import { VeOcean, ConfigHelper } from '@oceanprotocol/lib'; // Corrected import: removed 'Ocean'
+export async function connectWallet(): Promise<string> {
+  if (typeof window.ethereum === 'undefined') {
+    throw new Error('MetaMask or other Web3 wallet not detected. Please install one.');
+  }
 
-export async function getOceanInstance() {
-  const config = new ConfigHelper().getConfig('polygon'); // Assuming 'polygon' for your network
-  const ocean = await VeOcean.getInstance(config);
-  return ocean;
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+  if (accounts.length === 0) {
+    throw new Error('No accounts found or connected.');
+  }
+
+  const account = accounts[0];
+  return account;
 }

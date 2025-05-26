@@ -1,81 +1,62 @@
 // src/publishDataset.ts
 
-import { Ocean } from '@oceanprotocol/lib'; // Correct: Use 'Ocean' here too
-import { getOceanInstance } from './ocean'; // Import your helper function
-
-// These types are NOT exported by @oceanprotocol/lib@4.1.0 directly for DDO/Files
-// You should remove direct 'import type { DDO, Files }'
-// The library functions will infer the correct types when you pass the objects.
-
-// Assuming you have these variables available when calling publishDataAsset
-// Replace 'declare const' with actual function parameters or obtained values.
-// export async function publishDataAsset(title: string, cid: string, account: string) {
-// For now, I'll keep the placeholders as your original snippet had similar context.
+import { getOceanInstance } from './ocean';
 
 export async function publishDataAsset(title: string, cid: string, account: string) {
-  const ocean = await getOceanInstance();
+  const ocean = await getOceanInstance(); // This will correctly return an 'Ocean' instance
 
-  // DDO Metadata structure for Ocean v4.1.0
-  const metadata: any = { // Using 'any' to avoid type errors since DDO type is not exported directly
+  const metadata: any = { // Using 'any' for the DDO metadata structure
     created: new Date().toISOString(),
     updated: new Date().toISOString(),
-    type: 'dataset', // Or 'algorithm', 'container'
+    type: 'dataset',
     name: title,
     author: 'Goose Solutions',
     license: 'CC0: Public Domain',
     tags: ['environment', 'data', 'goose'],
-    // Add more metadata fields as required by your DDO structure
-    // e.g., 'description', 'links', 'checksums', etc.
   };
 
-  // Files structure for Ocean v4.1.0
-  const files: any[] = [ // Using 'any[]' since Files type is not exported directly
+  const files: any[] = [ // Using 'any[]' for the files array
     {
       type: 'ipfs',
       url: `ipfs://${cid}`
     }
   ];
 
-  // Datatoken parameters
   const datatokenParams = {
-    templateIndex: 1, // Default template for ERC-20
+    templateIndex: 1,
     name: `${title} Token`,
     symbol: 'GSTKN',
-    cap: '1000' // Max supply
+    cap: '1000'
   };
 
-  // Service structure for Ocean v4.1.0
-  const service: any = { // Using 'any' for simplicity
+  const service: any = { // Using 'any' for the service object
     type: 'access',
-    files: files, // Link to the files array
-    timeout: 0, // 0 for infinite
-    serviceEndpoint: ocean.provider.url // Use the provider URL for the service endpoint
+    files: files,
+    timeout: 0,
+    serviceEndpoint: ocean.provider.url
   };
 
-  // Construct the DDO object
-  const ddo: any = { // Using 'any' for simplicity
+  const ddo: any = { // Using 'any' for the DDO object
     metadata: metadata,
     services: [service]
   };
 
-  // Create the asset
   const created = await ocean.assets.create(ddo, account, [datatokenParams]);
   const datatokenAddress = created.services[0].datatokenAddress;
-  const nftAddress = created.nftAddress; // The NFT address of the asset
+  const nftAddress = created.nftAddress;
 
-  // Create a fixed rate exchange (listing)
   await ocean.fixedRateExchange.create({
     datatoken: datatokenAddress,
-    baseToken: await ocean.datatokens.getAddress('OCEAN'), // Base token (OCEAN)
+    baseToken: await ocean.datatokens.getAddress('OCEAN'),
     owner: account,
-    rate: '30', // Price (e.g., 30 OCEAN)
-    publishMarketSwapFee: '0', // Swap fee percentage for the market (0% for now)
-    marketFeeCollector: account, // Where market fees go
-    allowedConsumer: '0x0000000000000000000000000000000000000000' // 0 address for public listing
+    rate: '30',
+    publishMarketSwapFee: '0',
+    marketFeeCollector: account,
+    allowedConsumer: '0x0000000000000000000000000000000000000000'
   });
 
   return {
-    did: created.id, // Decentralized Identifier
+    did: created.id,
     datatokenAddress,
     nftAddress
   };

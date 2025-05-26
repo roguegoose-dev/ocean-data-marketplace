@@ -16,7 +16,7 @@ export default function DatasetViewer({ title, datatokenAddress, ipfsCid }: Prop
 
   useEffect(() => {
     async function init() {
-      const ocean = await getOceanInstance()
+      const ocean = await getOceanInstance() // This will now correctly return an 'Ocean' instance
       const userWallet = await connectWallet()
       setWallet(userWallet)
 
@@ -71,4 +71,3 @@ export default function DatasetViewer({ title, datatokenAddress, ipfsCid }: Prop
     </div>
   )
 }
-

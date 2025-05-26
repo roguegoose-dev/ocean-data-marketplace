@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { DragEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { publishDataset } from './publishDataset'
+import { publishDataAsset } from './publishDataset'
 import { connectWallet } from './wallet'
 
 const supabase = createClient(
@@ -85,7 +85,7 @@ function App() {
       const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsCid}`
 
       const account = await connectWallet()
-      const { datatokenAddress } = await publishDataset(account, title, ipfsCid)
+      const { datatokenAddress } = await publishDataAsset(title, ipfsCid, account)
 
       await supabase.from('datasets').insert([{
         title,
