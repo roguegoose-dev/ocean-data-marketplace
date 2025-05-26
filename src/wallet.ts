@@ -1,8 +1,6 @@
 // src/wallet.ts
-
 export async function connectWallet(): Promise<string> {
-  // Explicitly cast window to include ethereum property to satisfy TypeScript
-  const globalWindow = window as any;
+  const globalWindow = window as any; // Explicitly cast window to any
 
   if (typeof globalWindow.ethereum === 'undefined') {
     throw new Error('MetaMask or other Web3 wallet not detected. Please install one.');
