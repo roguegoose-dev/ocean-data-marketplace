@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { getOceanInstance } from './ocean'
 import { connectWallet } from './wallet'
 
 type Props = {
@@ -15,30 +14,45 @@ export default function DatasetViewer({ title, datatokenAddress, ipfsCid }: Prop
   const [price, setPrice] = useState<string | null>(null)
 
   useEffect(() => {
-    async function init() {
-      const ocean = await getOceanInstance() // This will now correctly return an 'Ocean' instance
+    async function checkAccess() {
       const userWallet = await connectWallet()
       setWallet(userWallet)
 
-      // 1. Check access
-      const balance = await ocean.datatokens.balance(datatokenAddress, userWallet)
-      setHasAccess(parseFloat(balance) > 0)
-      setStatus(parseFloat(balance) > 0 ? '✅ You already have access.' : '❌ You don’t have access yet.')
+      const res = await fetch('/.netlify/functions/checkAccess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ datatokenAddress, wallet: userWallet })
+      })
 
-      // 2. Load price
-      const fre = await ocean.fixedRateExchange.searchforDT(datatokenAddress)
-      if (fre?.length) setPrice(fre[0].rate)
+      const data = await res.json()
+      if (res.ok) {
+        setHasAccess(data.hasAccess)
+        setStatus(data.hasAccess ? '✅ You already have access.' : '❌ You don’t have access yet.')
+        setPrice(data.price)
+      } else {
+        setStatus(`❌ Failed to check access: ${data.error || 'Unknown error'}`)
+      }
     }
 
-    init()
+    checkAccess()
   }, [datatokenAddress])
 
   async function handleBuy() {
     try {
-      const ocean = await getOceanInstance()
-      await ocean.assets.order(datatokenAddress, wallet)
-      setHasAccess(true)
-      setStatus('✅ Token purchased! You now have access.')
+      setStatus('Purchasing token...')
+      const res = await fetch('/.netlify/functions/buyAccess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ datatokenAddress, wallet })
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setHasAccess(true)
+        setStatus('✅ Token purchased! You now have access.')
+      } else {
+        throw new Error(data.error || 'Unknown error')
+      }
     } catch (e) {
       console.error(e)
       setStatus('❌ Purchase failed.')
