@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { DragEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { publishDataAsset } from './publishDataset'
+import { publishDataAsset } from './publishDataAsset'
 import { connectWallet } from './wallet'
 
 const supabase = createClient(
