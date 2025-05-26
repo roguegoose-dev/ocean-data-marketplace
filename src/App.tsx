@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { DragEvent } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { publishDataAsset } from './publishDataAsset'
 import { connectWallet } from './wallet'
 
 const supabase = createClient(
@@ -83,9 +82,20 @@ function App() {
 
       const ipfsCid = pinataData.IpfsHash
       const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsCid}`
-
       const account = await connectWallet()
-      const { datatokenAddress } = await publishDataAsset(title, ipfsCid, account)
+
+      const backendRes = await fetch('/.netlify/functions/publishData', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, cid: ipfsCid, account })
+      })
+
+      const backendData = await backendRes.json()
+      if (!backendRes.ok) {
+        throw new Error(backendData.error || 'Unknown error from Ocean publish function')
+      }
+
+      const datatokenAddress = backendData.datatokenAddress
 
       await supabase.from('datasets').insert([{
         title,
@@ -96,7 +106,7 @@ function App() {
         user_id: user.id
       }])
 
-      setMessage(`✅ Uploaded & Published!`)
+      setMessage('✅ Uploaded & Published!')
       setTitle('')
       setDescription('')
       setFile(null)
